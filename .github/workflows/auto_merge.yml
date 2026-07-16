@@ -1,0 +1,30 @@
+name: Auto Merge VPN Subscriptions
+
+on:
+  schedule:
+    # این دستور تنظیم می‌کند که اسکریپت هر ۶ ساعت یک‌بار اجرا شود
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # این گزینه به شما اجازه می‌دهد هر زمان خواستید دستی هم آن را اجرا کنید
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Run Merge Script
+      run: python merge.py
+
+    - name: Commit and Push changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add sub.txt
+        git commit -m "Auto-update subscription" || exit 0
+        git push
